@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 400px; margin: 60px auto; background: #fff; padding: 30px 40px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h2 { text-align: center; margin-bottom: 24px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input[type="text"] { width: 100%; padding: 10px; margin-bottom: 18px; border: 1px solid #ccc; border-radius: 5px; }
+        button { width: 100%; padding: 12px; background: #007bff; color: #fff; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>QR Code Generator</h2>
+        <form method="POST">
+            <label for="url">Enter URL:</label>
+            <input type="text" id="url" name="url" required placeholder="https://example.com">
+            <label for="filename">Filename (with or without .png):</label>
+            <input type="text" id="filename" name="filename" required placeholder="qrcode.png">
+            <button type="submit">Generate QR Code</button>
+        </form>
+    </div>
+</body>
+</html>
