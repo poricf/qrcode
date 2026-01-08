@@ -9,7 +9,7 @@
         .container { max-width: 400px; margin: 60px auto; background: #fff; padding: 30px 40px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         h2 { text-align: center; margin-bottom: 24px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; }
-        input[type="text"] { width: 100%; padding: 10px; margin-bottom: 18px; border: 1px solid #ccc; border-radius: 5px; }
+        input[type="text"], input[type="color"] { width: 100%; padding: 10px; margin-bottom: 18px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background: #007bff; color: #fff; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
         button:hover { background: #0056b3; }
     </style>
@@ -17,14 +17,71 @@
 <body>
     <div class="container">
         <h2>QR Code Generator</h2>
-        <form method="POST" action="https://qrcode-6sj2.onrender.com/">
-    <label for="url">Enter URL:</label>
-    <input type="text" id="url" name="url" required placeholder="https://example.com">
-    <label for="filename">Filename (with or without .png):</label>
-    <input type="text" id="filename" name="filename" required placeholder="qrcode.png">
-    <button type="submit">Generate QR Code</button>
-</form>
+        <form method="POST" action="/" enctype="multipart/form-data">
+            <label for="url">Enter URL:</label>
+            <input type="text" id="url" name="url" required placeholder="https://example.com">
+
+            <label for="filename">Filename (with or without .png):</label>
+            <input type="text" id="filename" name="filename" required placeholder="qrcode.png">
+
+            <label for="logo">Logo PNG (optional):</label>
+            <input type="file" id="logo" name="logo" accept="image/png">
+            <p style="font-size: 12px; color: #555; margin-top: 4px; margin-bottom: 18px;">
+                Leave this empty to use the default TEMER branding.
+            </p>
+
+            <label for="primary_color_picker">QR Color picker:</label>
+            <input type="color" id="primary_color_picker" value="#7A9B2C">
+
+            <label for="primary_hex">QR Color HEX (optional):</label>
+            <input type="text" id="primary_hex" name="primary_hex" placeholder="#7A9B2C" value="">
+            <p style="font-size: 12px; color: #555; margin-top: 4px; margin-bottom: 18px;">
+                Use the picker or type a HEX like #7A9B2C. The swatch always shows what color will be used.
+            </p>
+
+            <button type="submit">Generate QR Code</button>
+        </form>
 
     </div>
+    <script>
+        (function () {
+            const picker = document.getElementById('primary_color_picker');
+            const hexInput = document.getElementById('primary_hex');
+
+            function normalizeHex(value) {
+                if (!value) return '';
+                let v = value.trim();
+                if (!v) return '';
+                if (v[0] !== '#') v = '#' + v;
+                if (/^#([0-9a-fA-F]{6})$/.test(v)) {
+                    return v.toUpperCase();
+                }
+                return null;
+            }
+
+            // When user moves the picker, update the hex box
+            picker.addEventListener('input', function () {
+                hexInput.value = picker.value.toUpperCase();
+                hexInput.style.borderColor = '#ccc';
+            });
+
+            // When user types hex, update picker and border color
+            hexInput.addEventListener('input', function () {
+                const normalized = normalizeHex(hexInput.value);
+                if (normalized) {
+                    hexInput.style.borderColor = '#ccc';
+                    picker.value = normalized;
+                } else {
+                    hexInput.style.borderColor = 'red';
+                }
+            });
+
+            // If a valid hex was pre-filled, sync picker once
+            const initial = normalizeHex(hexInput.value);
+            if (initial) {
+                picker.value = initial;
+            }
+        })();
+    </script>
 </body>
 </html>
