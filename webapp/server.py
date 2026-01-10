@@ -58,7 +58,12 @@ def _hex_to_rgb(hex_color: str):
     return r, g, b
 
 
-def generate_qr(link: str, logo_image: Image.Image | None = None, primary_hex: str | None = None):
+def generate_qr(
+    link: str,
+    logo_image: Image.Image | None = None,
+    primary_hex: str | None = None,
+    bg_mode: str = "white",
+):
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -68,7 +73,7 @@ def generate_qr(link: str, logo_image: Image.Image | None = None, primary_hex: s
     qr.add_data(link)
     qr.make(fit=True)
 
-    # Solid color modules on white background
+    # Solid color modules on white or transparent background
     # If no valid color is provided, fall back to normal black QR
     if primary_hex:
         try:
@@ -79,7 +84,13 @@ def generate_qr(link: str, logo_image: Image.Image | None = None, primary_hex: s
     else:
         fill = "black"
 
-    img = qr.make_image(fill_color=fill, back_color="white").convert("RGBA")
+    # Choose background depending on requested mode
+    if bg_mode == "transparent":
+        back = (255, 255, 255, 0)  # fully transparent
+    else:
+        back = "white"
+
+    img = qr.make_image(fill_color=fill, back_color=back).convert("RGBA")
 
     # If no logo was uploaded, return a plain QR (no center image)
     if logo_image is None:
@@ -121,6 +132,7 @@ def index():
         filename = request.form['filename']
         # Optional custom HEX color; if empty, use plain black QR
         primary_hex = request.form.get('primary_hex') or None
+        bg_mode = request.form.get('bg_mode') or "white"
         logo_image = None
         logo_file = request.files.get('logo')
         if logo_file and logo_file.filename:
@@ -130,7 +142,7 @@ def index():
             except Exception:
                 logo_image = None
 
-        img = generate_qr(url, logo_image, primary_hex)
+        img = generate_qr(url, logo_image, primary_hex, bg_mode)
         img_io = io.BytesIO()
         img.save(img_io, 'PNG')
         img_io.seek(0)
